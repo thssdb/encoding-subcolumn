@@ -3,10 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dataset_abbreviations = {
-    'Air-pressure': 'AP',
     'Bird-migration': 'BM',
     'Bitcoin-price': 'BP',
-    'Blockchain-tr': 'BTR',
     'City-temp': 'CT',
     'Dewpoint-temp': 'DT',
     'IR-bio-temp': 'IR',
@@ -14,12 +12,18 @@ dataset_abbreviations = {
     'Stocks-DE': 'SDE',
     'Stocks-UK': 'SUK',
     'Stocks-USA': 'SUSA',
-    'Wind-Speed': 'WS'
+    'Wind-Speed': 'WS',
+    'EPM-Education': 'EE',
+    'Wine-Tasting': 'WT',
 }
 
-df = pd.read_csv('./result/compression_time/baseline.csv')
+df = pd.read_csv('result/compression_time/baseline.csv')
+df2 = pd.read_csv('trans_data_result/compression_time/baseline.csv')
 
-bp_df = pd.read_csv('./result/bp.csv')
+bp_df = pd.read_csv('result/bp.csv')
+bp_df2 = pd.read_csv('trans_data_result/bp.csv')
+bp_df = pd.concat([bp_df, bp_df2], ignore_index=True)
+
 bp_df['Encoding Time / Points'] = bp_df['Encoding Time'] / bp_df['Points']
 
 df = df.merge(
@@ -32,7 +36,10 @@ df.rename(
     inplace=True
 )
 
-subcolumn_df = pd.read_csv('./result/subcolumn.csv')
+subcolumn_df = pd.read_csv('result/subcolumn.csv')
+subcolumn_df2 = pd.read_csv('trans_data_result/subcolumn.csv')
+subcolumn_df = pd.concat([subcolumn_df, subcolumn_df2], ignore_index=True)
+
 subcolumn_df['Encoding Time / Points'] = subcolumn_df['Encoding Time'] / \
     subcolumn_df['Points']
 
@@ -42,11 +49,15 @@ df = df.merge(
     how='left'
 )
 df.rename(
-    columns={'Encoding Time / Points': 'Sub-columns'},
+    columns={'Encoding Time / Points': 'Sub-column'},
     inplace=True
 )
 
-sprintz_subcolumn_df = pd.read_csv('./result/sprintz_subcolumn.csv')
+sprintz_subcolumn_df = pd.read_csv('result/sprintz_subcolumn.csv')
+sprintz_subcolumn_df2 = pd.read_csv('trans_data_result/sprintz_subcolumn.csv')
+sprintz_subcolumn_df = pd.concat(
+    [sprintz_subcolumn_df, sprintz_subcolumn_df2], ignore_index=True)
+
 sprintz_subcolumn_df['Encoding Time / Points'] = sprintz_subcolumn_df['Encoding Time'] / \
     sprintz_subcolumn_df['Points']
 
@@ -56,11 +67,15 @@ df = df.merge(
     how='left'
 )
 df.rename(
-    columns={'Encoding Time / Points': 'SPRINTZ+Sub-columns'},
+    columns={'Encoding Time / Points': 'SPRINTZ+Sub-column'},
     inplace=True
 )
 
-ts2diff_subcolumn_df = pd.read_csv('./result/ts2diff_subcolumn.csv')
+ts2diff_subcolumn_df = pd.read_csv('result/ts2diff_subcolumn.csv')
+ts2diff_subcolumn_df2 = pd.read_csv('trans_data_result/ts2diff_subcolumn.csv')
+ts2diff_subcolumn_df = pd.concat(
+    [ts2diff_subcolumn_df, ts2diff_subcolumn_df2], ignore_index=True)
+
 ts2diff_subcolumn_df['Encoding Time / Points'] = ts2diff_subcolumn_df['Encoding Time'] / \
     ts2diff_subcolumn_df['Points']
 
@@ -70,11 +85,14 @@ df = df.merge(
     how='left'
 )
 df.rename(
-    columns={'Encoding Time / Points': 'TS2DIFF+Sub-columns'},
+    columns={'Encoding Time / Points': 'TS2DIFF+Sub-column'},
     inplace=True
 )
 
-buff_df = pd.read_csv('./result/buff.csv')
+buff_df = pd.read_csv('result/buff.csv')
+buff_df2 = pd.read_csv('trans_data_result/buff.csv')
+buff_df = pd.concat([buff_df, buff_df2], ignore_index=True)
+
 buff_df['Encoding Time / Points'] = buff_df['Encoding Time'] / buff_df['Points']
 
 df = df.merge(
@@ -85,43 +103,65 @@ df = df.merge(
 df['BUFF'] = df['Encoding Time / Points']
 
 df = df[[
-    'Dataset', 'Gorilla', 'Chimp', 'Elf', 'RLE', 'BP', 'Sub-columns',
-    'SPRINTZ', 'SPRINTZ+Sub-columns',
-    'TS2DIFF', 'TS2DIFF+Sub-columns',
+    'Dataset', 'GORILLA', 'CHIMP', 'Elf', 'RLE', 'BP', 'Sub-column',
+    'SPRINTZ', 'SPRINTZ+Sub-column',
+    'TS2DIFF', 'TS2DIFF+Sub-column',
     'BUFF',
 ]]
 df.rename(
     columns={
-        'SPRINTZ': 'SPRINTZ+BP',
-        'TS2DIFF': 'TS2DIFF+BP'
+        'BP': 'BPE',
+        'SPRINTZ': 'SPRINTZ+BPE',
+        'TS2DIFF': 'TS2DIFF+BPE',
     },
     inplace=True
 )
 
+# print(df)
+
 df['Dataset'] = df['Dataset'].map(dataset_abbreviations)
 
+datasets = df['Dataset'].tolist()
+
+# 找到EE和WT的索引
+if 'EE' in datasets and 'WT' in datasets:
+    ee_index = datasets.index('EE')
+    wt_index = datasets.index('WT')
+
+    # 交换EE和WT
+    datasets[ee_index], datasets[wt_index] = datasets[wt_index], datasets[ee_index]
+
+# 根据新的顺序重新排列DataFrame
+combined_df = df.set_index('Dataset').loc[datasets].reset_index()
+
+# 绘图
 color_palette = [
-    '#A5D6A7', '#90CAF9', '#CE93D8', '#BCAAA4', '#AED581', '#FF0000', '#81D4FA', '#FF6600', '#9575CD', '#FF9900', '#FFE082',
+    '#A5D6A7', '#90CAF9', '#CE93D8', '#BCAAA4', '#AED581', '#FF0000', '#81D4FA',
+    '#FF6600', '#9575CD', '#FF9900', '#FFE082',
 ]
 
 fontsize = 13
 
-plt.figure(figsize=(15, 3.5))
+plt.figure(figsize=(15, 2.5))
 
-x = np.arange(len(df['Dataset'])) * len(df.columns[1:]) * 0.12
+x = np.arange(len(combined_df['Dataset'])) * \
+    len(combined_df.columns[1:]) * 0.12
 width = 0.1
-for i, column in enumerate(df.columns[1:]):
+hatches = ['*', '+', 'x',  '|', '-', '/', 'o', 'O',  '\\', '//', '.']
+
+for i, column in enumerate(combined_df.columns[1:]):
     plt.bar(
         x + i * width,
-        df[column],
+        combined_df[column],
         width,
         label=column,
-        color=color_palette[i]
+        color=color_palette[i],
+        hatch=hatches[i]
     )
 
 plt.xticks(
-    x + (len(df.columns[1:]) - 1) * width / 2,
-    df['Dataset'],
+    x + (len(combined_df.columns[1:]) - 1) * width / 2,
+    combined_df['Dataset'],
     fontsize=fontsize
 )
 plt.yticks(fontsize=fontsize)
@@ -130,27 +170,28 @@ plt.xlabel('Datasets', fontsize=fontsize)
 plt.ylabel('Compression Time (ns/point)', fontsize=fontsize)
 
 x_min = x[0] - width
-x_max = x[-1] + (len(df.columns[1:]) * width)
+x_max = x[-1] + (len(combined_df.columns[1:]) * width)
 plt.xlim(x_min, x_max)
 
 plt.legend(
     loc='upper center',
-    ncol=len(df.columns[1:]),
-    bbox_to_anchor=(0.475, 1.28),
+    ncol=len(combined_df.columns[1:]),
+    bbox_to_anchor=(0.47, 1.38),
     fontsize=fontsize,
-    columnspacing=2.6,
+    columnspacing=1.6,
     ncols=6
 )
 
 plt.savefig(
-    './fig/dataset_compression_time.png',
+    'fig/dataset_compression_time.png',
     dpi=1000,
     bbox_inches='tight'
 )
 plt.savefig(
-    './fig/dataset_compression_time.eps',
+    'fig/dataset_compression_time.eps',
     format='eps',
     dpi=1000,
     bbox_inches='tight'
 )
+
 # plt.show()

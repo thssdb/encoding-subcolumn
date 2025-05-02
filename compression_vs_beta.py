@@ -3,10 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
 dataset_abbreviations = {
-    'Air-pressure': 'AP',
     'Bird-migration': 'BM',
     'Bitcoin-price': 'BP',
-    'Blockchain-tr': 'BTR',
     'City-temp': 'CT',
     'Dewpoint-temp': 'DT',
     'IR-bio-temp': 'IR',
@@ -14,8 +12,13 @@ dataset_abbreviations = {
     'Stocks-DE': 'SDE',
     'Stocks-UK': 'SUK',
     'Stocks-USA': 'SUSA',
-    'Wind-Speed': 'WS'
+    'Wind-Speed': 'WS',
+    'EPM-Education': 'EE',
+    'Wine-Tasting': 'WT',
 }
+
+dataset_order = ['BM', 'BP', 'CT', 'DT', 'IR',
+                 'PM10', 'SDE', 'SUK', 'SUSA', 'WS', 'EE', 'WT']
 
 ax1: Axes
 ax2: Axes
@@ -23,7 +26,7 @@ ax3: Axes
 fig, (ax1, ax2, ax3) = plt.subplots(
     1,
     3,
-    figsize=(24, 6)
+    figsize=(24, 7)
 )
 
 beta_list = list(range(1, 32))
@@ -32,7 +35,9 @@ fontsize = 20
 labelsize = 20
 
 file_names = [
-    f'./result/compression_vs_beta/subcolumn_beta_{beta}.csv' for beta in beta_list]
+    f'result/compression_vs_beta/subcolumn_beta_{beta}.csv' for beta in beta_list]
+trans_file_names = [
+    f'trans_data_result/compression_vs_beta/subcolumn_trans_data_beta_{beta}.csv' for beta in beta_list]
 
 colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffc107',
           '#a65628', '#f781bf', '#999999', '#66c2a5', '#fc8d62', '#8da0cb']
@@ -40,10 +45,21 @@ markers = ['o', 's', 'D', '^', 'v', '>', '<', 'p', 'h', 'H', 'd', '*']
 
 # ax1
 compression_ratios = {}
-for file_name, beta in zip(file_names, beta_list):
+
+for file_name, trans_file_name, beta in zip(file_names, trans_file_names, beta_list):
     df = pd.read_csv(file_name)
-    df['Dataset'] = df['Dataset'].map(dataset_abbreviations)
-    for index, row in df.iterrows():
+    trans_df = pd.read_csv(trans_file_name)
+    combined_df = pd.concat([df, trans_df], ignore_index=True)
+    combined_df['Dataset'] = combined_df['Dataset'].map(dataset_abbreviations)
+
+    combined_df['Dataset'] = pd.Categorical(
+        combined_df['Dataset'],
+        categories=dataset_order,
+        ordered=True
+    )
+    combined_df = combined_df.sort_values('Dataset')
+
+    for index, row in combined_df.iterrows():
         dataset = row['Dataset']
         compression_ratio = 1 / row['Compression Ratio']
         if dataset not in compression_ratios:
@@ -56,8 +72,8 @@ for i, (dataset, ratios) in enumerate(compression_ratios.items()):
     compression_values = [x[1] for x in ratios]
     max_ratio_index = compression_values.index(max(compression_values))
 
-    color = colors[i]
-    marker = markers[i]
+    color = colors[i % len(colors)]
+    marker = markers[i % len(markers)]
 
     ax1.plot(
         beta,
@@ -86,10 +102,20 @@ ax1.set_xticks(beta[::3])
 
 # ax2
 compression_times = {}
-for file_name, beta in zip(file_names, beta_list):
+for file_name, trans_file_name, beta in zip(file_names, trans_file_names, beta_list):
     df = pd.read_csv(file_name)
-    df['Dataset'] = df['Dataset'].map(dataset_abbreviations)
-    for index, row in df.iterrows():
+    trans_df = pd.read_csv(trans_file_name)
+    combined_df = pd.concat([df, trans_df], ignore_index=True)
+    combined_df['Dataset'] = combined_df['Dataset'].map(dataset_abbreviations)
+
+    combined_df['Dataset'] = pd.Categorical(
+        combined_df['Dataset'],
+        categories=dataset_order,
+        ordered=True
+    )
+    combined_df = combined_df.sort_values('Dataset')
+
+    for index, row in combined_df.iterrows():
         dataset = row['Dataset']
         compression_time = row['Encoding Time'] / row['Points']
         if dataset not in compression_times:
@@ -101,8 +127,8 @@ for i, (dataset, ratios) in enumerate(compression_times.items()):
     beta = [x[0] for x in ratios]
     compression_values = [x[1] for x in ratios]
 
-    color = colors[i]
-    marker = markers[i]
+    color = colors[i % len(colors)]
+    marker = markers[i % len(markers)]
 
     ax2.plot(
         beta,
@@ -124,10 +150,20 @@ ax2.set_xticks(beta[::3])
 
 # ax3
 decompression_times = {}
-for file_name, beta in zip(file_names, beta_list):
+for file_name, trans_file_name, beta in zip(file_names, trans_file_names, beta_list):
     df = pd.read_csv(file_name)
-    df['Dataset'] = df['Dataset'].map(dataset_abbreviations)
-    for index, row in df.iterrows():
+    trans_df = pd.read_csv(trans_file_name)
+    combined_df = pd.concat([df, trans_df], ignore_index=True)
+    combined_df['Dataset'] = combined_df['Dataset'].map(dataset_abbreviations)
+
+    combined_df['Dataset'] = pd.Categorical(
+        combined_df['Dataset'],
+        categories=dataset_order,
+        ordered=True
+    )
+    combined_df = combined_df.sort_values('Dataset')
+
+    for index, row in combined_df.iterrows():
         dataset = row['Dataset']
         decompression_time = row['Decoding Time'] / row['Points']
         if dataset not in decompression_times:
@@ -139,8 +175,8 @@ for i, (dataset, ratios) in enumerate(decompression_times.items()):
     beta = [x[0] for x in ratios]
     compression_values = [x[1] for x in ratios]
 
-    color = colors[i]
-    marker = markers[i]
+    color = colors[i % len(colors)]
+    marker = markers[i % len(markers)]
 
     ax3.plot(
         beta,
@@ -166,18 +202,19 @@ fig.legend(
     labels,
     loc='upper center',
     ncol=12,
-    bbox_to_anchor=(0.5, 1.07),
+    bbox_to_anchor=(0.5, 1.1),
     columnspacing=0.68,
     fontsize=fontsize
 )
 
 plt.savefig(
-    './fig/beta_comparison.png',
+    'fig/beta_comparison.png',
     dpi=1000,
     bbox_inches='tight'
 )
+
 plt.savefig(
-    './fig/beta_comparison.eps',
+    'fig/beta_comparison.eps',
     format='eps',
     dpi=1000,
     bbox_inches='tight'

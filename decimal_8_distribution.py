@@ -2,21 +2,9 @@ from collections import Counter
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import numpy as np
+import os
 
-files = [
-    'City-temp',
-    'Stocks-UK',
-    'Bird-migration',
-    'Stocks-DE',
-    'Air-pressure',
-    'Blockchain-tr',
-    'Stocks-USA',
-    'Vehicle-charge',
-    'Dewpoint-temp',
-    'PM10-dust',
-    'IR-bio-temp',
-    'Wind-speed',
-]
+files = [f.replace('.csv', '') for f in os.listdir('dataset') if f.endswith('.csv')]
 
 positions = [4, 5, 6, 7]
 
@@ -32,11 +20,12 @@ for file in files:
 
     decimal_places = []
 
-    with open(f'./dataset/{file}.csv', 'r') as f:
+    with open(f'dataset/{file}.csv', 'r') as f:
         for line in f:
             num_str = line.strip()
-            if num_str != '""' and num_str != '':
+            if num_str != '""':
                 numbers_str.append(num_str)
+                
                 if '.' in num_str:
                     decimal_part = num_str.split('.')[1]
                     decimal_places.append(len(decimal_part))
@@ -47,23 +36,21 @@ for file in files:
 
     digit_counters = [Counter({str(i): 0 for i in range(8)}) for _ in range(8)]
 
-    max_num = 0
-
     for num_str in numbers_str:
         num = float(num_str)
         num *= 10 ** n
-
-        max_num = max(max_num, num)
 
         octal_str = oct(int(num))
 
         o_index = octal_str.find('o')
         octal_str = octal_str[o_index + 1:].zfill(8)
 
-        for idx, digit in enumerate(reversed(octal_str)):
-            if idx >= len(digit_counters):
-                digit_counters.append(Counter())
-            digit_counters[idx][digit] += 1
+        # 反转octal_str
+        octal_str = octal_str[::-1]
+
+        for i in range(8):
+            digit = octal_str[i]
+            digit_counters[i][digit] += 1
 
     position_data[file] = {
         'counters': [digit_counters[i] for i in positions],
@@ -92,13 +79,13 @@ axes: np.ndarray
 fig, axes = plt.subplots(
     2,
     2,
-    figsize=(12, 14)
+    figsize=(12, 10)
 )
 
 for i, line in enumerate(title_text):
     fig.text(
         0.85,
-        0.96 - i*0.03,
+        0.96 - i * 0.03,
         line,
         fontsize=fontsize,
         horizontalalignment='right',
@@ -106,8 +93,8 @@ for i, line in enumerate(title_text):
     )
 
 plt.subplots_adjust(
-    top=0.78,
-    hspace=0.3,
+    top=0.76,
+    hspace=0.35,
     wspace=0.3
 )
 
@@ -164,13 +151,19 @@ for subplot_idx, ax in enumerate(axes_flat):
         labelsize=fontsize
     )
 
+# handles, labels = axes[0].get_legend_handles_labels()
+
+# fig.legend(handles, labels, loc='upper center', fontsize=fontsize,
+#            ncol=6, bbox_to_anchor=(0.5, 1.15))
+
 plt.savefig(
-    './fig/digit_distribution_8.png',
+    'fig/digit_distribution_8.png',
     dpi=1000,
     bbox_inches='tight'
 )
+
 plt.savefig(
-    './fig/digit_distribution_8.eps',
+    'fig/digit_distribution_8.eps',
     format='eps',
     dpi=1000,
     bbox_inches='tight'

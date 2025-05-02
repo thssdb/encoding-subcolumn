@@ -6,15 +6,15 @@ from matplotlib.axes import Axes
 axes: np.ndarray
 fig, axes = plt.subplots(
     2,
-    3,
-    figsize=(24, 14)
+    4,
+    figsize=(24, 8.5)
 )
 
 axes_flat = axes.flatten()
 
 plt.subplots_adjust(
-    hspace=0.25,
-    wspace=0.25
+    hspace=0.4,
+    wspace=0.3
 )
 
 block_sizes = [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
@@ -22,22 +22,28 @@ block_sizes = [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
 fontsize = 21
 labelsize = 21
 
-buff_value = 11.57
+buff_df = pd.read_csv('result/buff.csv')
+buff_df['Decoding Time per Point'] = buff_df['Decoding Time'] / buff_df['Points']
+buff_value = buff_df['Decoding Time per Point'].mean()
+
+# print(buff_value)
 
 query_types = [
     ('greater', '(a) X > v'),
     ('less', '(b) X < v'),
     ('equal', '(c) X = v'),
-    ('max', '(d) MAX(X)'),
-    ('sum', '(e) SUM(X)'),
-    ('count', '(f) COUNT(v)')
+    ('greater_less', '(d) X > a and X < b'),
+    ('max', '(e) MAX(X)'),
+    ('sum', '(f) SUM(X)'),
+    ('count', '(g) COUNT(v)'),
+    ('less_parts', '(h) X < a and Y < b'),
 ]
 
 for i, (query_type, title) in enumerate(query_types):
     ax: Axes = axes_flat[i]
 
     file_names = [
-        f'./result/query_vs_block/subcolumn_query_{query_type}_block_{size}.csv' for size in block_sizes
+        f'result/query_vs_block/subcolumn_query_{query_type}_block_{size}.csv' for size in block_sizes
     ]
 
     decoding_times = {}
@@ -96,9 +102,11 @@ for i, (query_type, title) in enumerate(query_types):
         horizontalalignment='right'
     )
 
-    if i in [3, 5]:
-        current_ylim = ax.get_ylim()
-        ax.set_ylim(top=current_ylim[1] * 1.05)
+    ax.set_ylim(0, 21)
+
+    # if i in [3, 5]:
+    #     current_ylim = ax.get_ylim()
+    #     ax.set_ylim(top=current_ylim[1] * 1.05)
 
     ax.tick_params(
         axis='both',
@@ -119,12 +127,13 @@ for i, (query_type, title) in enumerate(query_types):
     ax.set_title(title, fontsize=fontsize)
 
 plt.savefig(
-    './fig/query_vs_block_size.png',
+    'fig/query_vs_block_size.png',
     dpi=1000,
     bbox_inches='tight'
 )
+
 plt.savefig(
-    './fig/query_vs_block_size.eps',
+    'fig/query_vs_block_size.eps',
     format='eps',
     dpi=1000,
     bbox_inches='tight'

@@ -9,7 +9,7 @@ ax3: Axes
 fig, (ax1, ax2, ax3) = plt.subplots(
     1,
     3,
-    figsize=(24, 6.5)
+    figsize=(24, 7)
 )
 
 block_sizes = [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
@@ -18,15 +18,19 @@ fontsize = 20
 labelsize = 20
 
 file_names = [
-    f'./result/compression_vs_block/subcolumn_block_{size}.csv' for size in block_sizes]
+    f'result/compression_vs_block/subcolumn_block_{size}.csv' for size in block_sizes]
+trans_file_names = [
+    f'trans_data_result/compression_vs_block/subcolumn_trans_data_block_{size}.csv' for size in block_sizes]
 
 # ax1
 compression_ratios = {}
 
-for file_name, block_size in zip(file_names, block_sizes):
+for file_name, trans_file_name, block_size in zip(file_names, trans_file_names, block_sizes):
     df = pd.read_csv(file_name)
+    trans_df = pd.read_csv(trans_file_name)
+    combined_df = pd.concat([df, trans_df], ignore_index=True)
 
-    for index, row in df.iterrows():
+    for index, row in combined_df.iterrows():
         dataset = row['Dataset']
         compression_ratio = 1 / row['Compression Ratio']
 
@@ -79,10 +83,12 @@ ax1.set_title('(a) Compression ratio', fontsize=fontsize)
 # ax2
 encoding_times = {}
 
-for file_name, block_size in zip(file_names, block_sizes):
+for file_name, trans_file_name, block_size in zip(file_names, trans_file_names, block_sizes):
     df = pd.read_csv(file_name)
+    trans_df = pd.read_csv(trans_file_name)
+    combined_df = pd.concat([df, trans_df], ignore_index=True)
 
-    for index, row in df.iterrows():
+    for index, row in combined_df.iterrows():
         dataset = row['Dataset']
         time_per_point = row['Encoding Time'] / row['Points']
 
@@ -136,10 +142,13 @@ ax2.set_title('(b) Compression time', fontsize=fontsize)
 # ax3
 decoding_times = {}
 
-for file_name, block_size in zip(file_names, block_sizes):
+for file_name, trans_file_name, block_size in zip(file_names, trans_file_names, block_sizes):
     df = pd.read_csv(file_name)
+    trans_df = pd.read_csv(trans_file_name)
 
-    for index, row in df.iterrows():
+    combined_df = pd.concat([df, trans_df], ignore_index=True)
+
+    for index, row in combined_df.iterrows():
         dataset = row['Dataset']
         time_per_point = row['Decoding Time'] / row['Points']
 
@@ -191,12 +200,12 @@ ax3.set_ylabel('Decompression Time (ns/point)', fontsize=fontsize)
 ax3.set_title('(c) Decompression time', fontsize=fontsize)
 
 plt.savefig(
-    './fig/block_size_comparison.png',
+    'fig/block_size_comparison.png',
     dpi=1000,
     bbox_inches='tight'
 )
 plt.savefig(
-    './fig/block_size_comparison.eps',
+    'fig/block_size_comparison.eps',
     format='eps',
     dpi=1000,
     bbox_inches='tight'
