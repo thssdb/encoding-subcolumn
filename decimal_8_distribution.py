@@ -4,7 +4,8 @@ from matplotlib.axes import Axes
 import numpy as np
 import os
 
-files = [f.replace('.csv', '') for f in os.listdir('dataset') if f.endswith('.csv')]
+files = [f.replace('.csv', '')
+         for f in os.listdir('dataset') if f.endswith('.csv')]
 
 positions = [4, 5, 6, 7]
 
@@ -25,7 +26,7 @@ for file in files:
             num_str = line.strip()
             if num_str != '""':
                 numbers_str.append(num_str)
-                
+
                 if '.' in num_str:
                     decimal_part = num_str.split('.')[1]
                     decimal_places.append(len(decimal_part))
@@ -45,7 +46,6 @@ for file in files:
         o_index = octal_str.find('o')
         octal_str = octal_str[o_index + 1:].zfill(8)
 
-        # 反转octal_str
         octal_str = octal_str[::-1]
 
         for i in range(8):
@@ -57,14 +57,15 @@ for file in files:
         'total_count': len(numbers_str)
     }
 
-# print(position_data)
 
 title_text = [
     'sub-columns: (8th,  7th,  6th,  5th,  4th,  3rd, 2nd,  1st)',
+    '       ...        =  ( ...,    ...,     ...,    ...,    ...,    ...,    ...,    ... )',
     '10791147  =  (101, 001, 001, 010, 100, 011, 101, 011)',
     '10792951  =  (101, 001, 001, 010, 111, 111, 110, 111)',
     '10786947  =  (101, 001, 001, 001, 100, 010, 000, 011)',
     '10819218  =  (101, 001, 010, 001, 011, 010, 010, 010)',
+    '       ...        =  ( ...,    ...,     ...,    ...,    ...,    ...,    ...,    ... )',
 ]
 
 # 101001001010100011101011
@@ -84,17 +85,17 @@ fig, axes = plt.subplots(
 
 for i, line in enumerate(title_text):
     fig.text(
-        0.85,
-        0.96 - i * 0.03,
+        0.45,
+        0.96 - i * 0.04,
         line,
         fontsize=fontsize,
-        horizontalalignment='right',
+        horizontalalignment='center',
         verticalalignment='top'
     )
-
+fontsize = 24
 plt.subplots_adjust(
-    top=0.76,
-    hspace=0.35,
+    top=0.65,
+    hspace=0.5,
     wspace=0.3
 )
 
@@ -151,21 +152,7 @@ for subplot_idx, ax in enumerate(axes_flat):
         labelsize=fontsize
     )
 
-# handles, labels = axes[0].get_legend_handles_labels()
+plt.savefig('fig/digit_distribution_8.png', dpi=1000, bbox_inches='tight')
 
-# fig.legend(handles, labels, loc='upper center', fontsize=fontsize,
-#            ncol=6, bbox_to_anchor=(0.5, 1.15))
-
-plt.savefig(
-    'fig/digit_distribution_8.png',
-    dpi=1000,
-    bbox_inches='tight'
-)
-
-plt.savefig(
-    'fig/digit_distribution_8.eps',
-    format='eps',
-    dpi=1000,
-    bbox_inches='tight'
-)
-# plt.show()
+plt.savefig('fig/digit_distribution_8.eps',
+            format='eps', dpi=1000, bbox_inches='tight')

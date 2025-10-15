@@ -35,7 +35,7 @@ java xxx.java
 | ------------------- | ------------------------------------------------------------------------------------- |
 | Sub-columns         | iotdb\tsfile\src\test\java\org\apache\iotdb\tsfile\encoding\SubcolumnTest.java        |
 | SPRINTZ+Sub-columns | iotdb\tsfile\src\test\java\org\apache\iotdb\tsfile\encoding\SPRINTZSubcolumnTest.java |
-| TS2DIFF+Sub-columns | iotdb\tsfile\src\test\java\org\apache\iotdb\tsfile\encoding\TSDIFFSubcolumnTest.java |
+| TS2DIFF+Sub-columns | iotdb\tsfile\src\test\java\org\apache\iotdb\tsfile\encoding\TSDIFFSubcolumnTest.java  |
 
 - Get figures about xxx.py
 
@@ -45,13 +45,17 @@ python xxx.py
 
 - The figures corresponding to the python code are as follows
 
-| Figures   | python code                     |
-| --------- | ------------------------------- |
-| Figure 1  | decimal_8_distribution.py       |
-| Figure 7  | compression_ratio.py            |
-| Figure 8  | compression_time.py             |
-| Figure 9  | decompression_time.py           |
-| Figure 10 | compression_vs_beta.py          |
-| Figure 11 | compression_vs_block_boxplot.py |
-| Figure 12 | query_vs_beta_boxplot.py        |
-| Figure 13 | query_vs_block_boxplot.py       |
+| Figures   | python code                           |
+| --------- | ------------------------------------- |
+| Figure 1  | decimal_8_distribution.py             |
+| Figure 7  | R0_merge_compression_ratio_time_de.py |
+| Figure 8  | R4O5_compression_vs_beta(a).py        |
+| Figure 9  | R1D1_R1D4_R3O1_query.py               |
+| Figure 10 | R1D3_materialization.py               |
+| Figure 11 | R1D7_aggregation_vs_null_rate.py      |
+| Figure 12 | R1D8_compare_parallel_filter.py       |
+| Figure 13 | R1D6_compare_sort_key_and_value.py    |
+| Figure 14 | R2O1_compare_update_new.py            |
+| Figure 15 | R2O2_add_dictionary.py                |
+| Figure 16 | R3O2_compare_pso.py                   |
+| Figure 17 | R4O6_ablation_study.py                |
