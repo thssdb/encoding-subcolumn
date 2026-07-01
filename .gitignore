@@ -162,3 +162,12 @@ cython_debug/
 #.idea/
 
 .DS_Store
+fig_test/
+
+*.tsfile
+*.bin
+
+dataset_long/
+decoded_read_csv*/
+decoded_csv*/
+dataset_big*/
