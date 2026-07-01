@@ -22,13 +22,13 @@ Artifacts and Python tooling for the **sub-column compression** experiments repo
 
 ### IoTDB research fork
 
-Repository link: [https://anonymous.4open.science/r/iotdb-research-encoding-subcolumns](https://anonymous.4open.science/r/iotdb-research-encoding-subcolumns)
+Repository link: [https://github.com/apache/iotdb/tree/research/encoding-subcolumn](https://github.com/apache/iotdb/tree/research/encoding-subcolumn)
 
 Included location: `subcolumn/iotdb/` (sibling of this README).
 
 ### TsFile research fork
 
-Repository link: [https://anonymous.4open.science/r/tsfile-research-encoding-subcolumns](https://anonymous.4open.science/r/tsfile-research-encoding-subcolumns)
+Repository link: [https://github.com/apache/tsfile/tree/research/encoding-subcolumn](https://github.com/apache/tsfile/tree/research/encoding-subcolumn)
 
 Included location: `subcolumn/tsfile/` (sibling of this README; retained as project source, not used by the current Figure 1/11/12/13/14 scripts).
 
